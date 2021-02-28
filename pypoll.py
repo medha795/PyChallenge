@@ -1,58 +1,57 @@
-# Import os module that has functions to interact with the file system
 import os
-# Import module for reading CSV files
 import csv
 
-#Get current working directory
-cwkdir = os.getcwd()
-#Append file directory and make a complete file path
-filepath = os.path.join( cwkdir,'Resources','election_data.csv')
+csvpath = os.path.join('election_data.csv')
 
-#Initialize variables
-totalcount = 0; kcount = 0; ccount = 0; lcount = 0; ocount = 0; max_votecount = 0
+ 
+poll_data={}
+total_votes = 0
+with open(csvpath, 'r') as csvfile:
+    csvread = csv.reader(csvfile)
+    next(csvread, None)
 
-#Function for % calculation
-def percentage (part, whole):
-    return 100 * float(part)/float(whole)
+    for row in csvread:
+        total_votes += 1
+        if row[2] in poll_data.keys():
+            poll_data[row[2]] = poll_data[row[2]] + 1
+        else:
+            poll_data[row[2]] = 1 
+    
 
-#Open and read CSV file
-with open(filepath, newline='') as csvfile:
-     csvreader = csv.reader(csvfile, delimiter=',')
+candidates = []  
+tot_num_votes = []
 
-     for i in csvreader:
-         voterid = i[0]
-         country = i[1]
-         candidate = i[2]
-         # Find Total Vote Count
-         totalcount = totalcount + 1
+for key, value in poll_data.items():
+    candidates.append(key)
+    tot_num_votes.append(value)
+  
 
-         # Find votecount by candidates
-         if candidate =="Khan":
-            kcount = kcount + 1
-         if candidate =="Correy":
-            ccount = ccount + 1
-         if candidate =="Li":
-            lcount = lcount + 1
-         if candidate =="O'Tooley":
-            ocount = ocount + 1
-            
-# Define (dictionary) list : candidate and votes
-     candidatevote = {"Khan": kcount,"Correy": ccount,"Li" :lcount, "O'Tooley": ocount}
-     # Find winner 
-     for candidate, value in candidatevote.items():
-         if value > max_votecount:
-            max_votecount = value
-            winner = candidate
-# Display results       
-print(f'Election Results'+'\n')
-print(f'-------------------------------'+'\n')
-print(f'Total Votes: {totalcount}'+'\n')
-print(f'-------------------------------'+'\n')
+percentage_votes =[]
+for n in tot_num_votes:
+    percentage_votes.append(round(n/total_votes * 100, 1))
+ 
 
-print(f'Khan: {percentage(kcount,totalcount):.3f}%  ({kcount})')
-print(f'Correy: {percentage(ccount,totalcount):.3f}%  ({ccount})')
-print(f'Li: {percentage(lcount,totalcount):.3f}%  ({lcount})')
-print(f'O\'Tooley: {percentage(ocount,totalcount):.3f}%  ({ocount})')
-print(f'--------------------------------'+'\n')
-print(f'Winner: {winner} '+'\n')
-print(f'--------------------------------'+'\n')
+clean_data = list(zip(candidates, tot_num_votes, percentage_votes))
+
+winner_list = []
+for name in clean_data:
+    if max(tot_num_votes) == name[1]:
+        winner_list.append(name[0])
+winner = winner_list[0]
+
+
+print ("Election results :")
+print(total_votes) 
+print(candidates)  
+print(percentage_votes)
+print(tot_num_votes)  
+print(winner)
+
+
+PyPoll = open("output.txt","w+")
+PyPoll.write("Election Results")  
+PyPoll.write('\n' + "Total_votes" + str(total_votes)) 
+PyPoll.write('\n' + str(candidates))
+PyPoll.write('\n' + str(percentage_votes))
+PyPoll.write('\n' + str(tot_num_votes)) 
+PyPoll.write('\n' + "Winner:" + winner)    

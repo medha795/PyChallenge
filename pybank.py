@@ -1,67 +1,74 @@
-#import budget data 
+
+
 import os
-import csv 
-#working directory
+import csv
 
-csvpath=os.path.join('..','Resources','budget_data.csv')
-with open(csvpath, newline='') as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',')
-    print(csvreader)
-    csv_header = next(csvreader)
-    month = []
-    revenue = []
-    revenue_change = []
-    monthly_change = []
-    
-    print(f"Header: {csv_header}")               
 
-#Months       
+
+csvpath = os.path.join('budget_data.csv')
+
+
+total_months = 0
+total_revenue =0
+changes =[]
+date_count = []
+greatest_inc = 0
+greatest_inc_month = 0
+greatest_dec = 0
+greatest_dec_month = 0
+
+
+with open(csvpath, newline = '') as csvfile:
+    csvreader = csv.reader(csvfile, delimiter = ',')
+    next(csvreader, None)
+    row = next(csvreader)
+
+    previous_profit = int(row[1])
+    total_months = total_months + 1
+    total_revenue = total_revenue + int(row[1])
+    greatest_inc = int(row[1])
+    greatest_inc_month = row[0]
+
     for row in csvreader:
-        month.append(row[0])
-        revenue.append(row[1])
-    print(len(month))
- #Revenue 
-    revenue_int = map(int,revenue)
-    total_revenue = (sum(revenue_int))
-    print(total_revenue)
+ 
+        total_months = total_months + 1
+        total_revenue = total_revenue + int(row[1])
 
- #Avg Change
-    i = 0
-    for i in range(len(revenue) - 1):
-        profit_loss = int(revenue[i+1]) - int(revenue[i])
- # append profit_loss
-        revenue_change.append(profit_loss)
-    Total = sum(revenue_change)
-    #print(revenue_change)
-    monthly_change = Total / len(revenue_change)
-    print(monthly_change)
-    #print(Total)
+        change = int(row[1]) - previous_profit
+        changes.append(change)
+        previous_profit = int(row[1])
+        date_count.append(row[0])
+        
     
-#Greatest Increase
-    profit_increase = max(revenue_change)
-    print(profit_increase)
-    k = revenue_change.index(profit_increase)
-    month_increase = month[k+1]
-    
-#Greatest Decrease
-    profit_decrease = min(revenue_change)
-    print(profit_decrease)
-    j = revenue_change.index(profit_decrease)
-    month_decrease = month[j+1]
+        if int(row[1]) > greatest_inc:
+            greatest_inc = int(row[1])
+            greatest_inc_month = row[0]
+            
+   
+        if int(row[1]) < greatest_dec:
+            greatest_dec = int(row[1])
+            greatest_dec_month = row[0]  
+  
+    average_change = sum(changes)/len(changes)
+
+    high = max(changes)
+    low = min(changes)
 
 
-#Print Statements
+    print("Financial Analysis")
+    print("Total Months:" + str(total_months))
+    print("Total Amount:" + str(total_revenue))
+    print(average_change)
+    print(greatest_inc_month, max(changes))
+    print(greatest_dec_month, min(changes))
 
-print(f'Financial Analysis'+'\n')
-print(f'----------------------------'+'\n')
 
-
-print("Total number of months: " + str(len(month)))
-
-print("Total Revenue in period: $ " + str(total_revenue))
-      
-print("Average monthly change in Revenue : $" + str(monthly_change))
-
-print(f"Greatest Increase in Profits: {month_increase} (${profit_increase})")
-
-print(f"Greatest Decrease in Profits: {month_decrease} (${profit_decrease})")
+    PyBank = open("output.txt","w+")
+    PyBank.write("Financial Analysis") 
+    PyBank.write('\n' +"Total Months" + str(total_months)) 
+    PyBank.write('\n' +"Total Amount" + str(total_revenue)) 
+    PyBank.write('\n' +"Average" + str(average_change)) 
+    PyBank.write('\n' +greatest_inc_month) 
+    PyBank.write('\n' +str(high))
+    PyBank.write('\n' +greatest_dec_month) 
+    PyBank.write('\n' +str(low))  
